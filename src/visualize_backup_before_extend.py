@@ -35,18 +35,3 @@ def plot_equity_curve(df: pd.DataFrame, out_png: str, title: str = "Equity Curve
     plt.savefig(out_png, dpi=150)
     plt.close()
     print(f"[OK] 그래프 저장 완료: {out_png}")
-
-def compare_equity_curves(curves: dict, out_png: str = "reports/equity_compare.png"):
-    """여러 전략의 Equity를 한 그림에 비교"""
-    import os, matplotlib.pyplot as plt
-    plt.figure(figsize=(10,5))
-    for name, series in curves.items():
-        plt.plot(series.index, series.values, label=name)
-    plt.title("Equity Curves Comparison")
-    plt.xlabel("Date"); plt.ylabel("Value")
-    plt.legend(); plt.grid(True, linestyle="--", alpha=0.3)
-    plt.tight_layout()
-    os.makedirs(os.path.dirname(out_png), exist_ok=True)
-    plt.savefig(out_png, dpi=150)
-    plt.close()
-    print(f"[OK] 비교 그래프 저장: {out_png}")
