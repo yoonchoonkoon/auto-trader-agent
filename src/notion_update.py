@@ -1,6 +1,11 @@
 # notion_update.py
 import os, csv, sys
 from notion_client import Client
+from dotenv import load_dotenv
+
+# .env 파일을 상위 폴더에서 로드
+env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(dotenv_path=env_path)
 
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")  # Notion Integration secret
 NOTION_DB_ID = os.environ.get("NOTION_DB_ID")  # 대상 DB ID
@@ -27,22 +32,48 @@ def read_metrics(csv_path):
                 print(f"[WARN] {i}행 스킵: {e}")
     return rows
 
+def upsert_page(client, db_id, name, fast, slow, cagr, sharpe, maxdd):
+    props = {
+        "Name": {"title": [{"text": {"content": name}}]},
+        "fast": {"number": fast},
+        "slow": {"number": slow},
+        "CAGR": {"number": cagr},
+        "Sharpe(ann)": {"number": sharpe},
+        "MaxDD": {"number": maxdd},
+    }
+
+    resp = client.search(
+        query=name,
+        filter={"property": "object", "value": "page"},
+        page_size=10,
+    )
+    results = []
+
+    for p in resp.get("results", []):
+        if p.get("parent", {}).get("database_id") != db_id:
+            continue
+        title_rich = p.get("properties", {}).get("Name", {}).get("title", [])
+        plain = "".join([t.get("plain_text", "") for t in title_rich]).strip()
+        if plain == name:
+            results.append(p)
+    if results:
+        page_id = results[0]["id"]
+        client.pages.update(page_id=page_id, properties=props)
+        print(f"[UPDATE] {name}")
+    else:
+        client.pages.create(parent={"database_id": db_id}, properties=props)
+        print(f"[CREATE] {name}")
+
 def to_notion(pages, client: Client):
     ok = 0
     for r in pages:
         title = f"fast{r['fast']}_slow{r['slow']}"
-        client.pages.create(
-            parent={"database_id": NOTION_DB_ID},
-            properties={
-                "Name": {"title": [{"text": {"content": title}}]},
-                "fast": {"number": r["fast"]},
-                "slow": {"number": r["slow"]},
-                "CAGR": {"number": r["CAGR"]},
-                "Sharpe(ann)": {"number": r["Sharpe(ann)"]},
-                "MaxDD": {"number": r["MaxDD"]},
-            },
+        upsert_page(
+            client, NOTION_DB_ID,              # ✅ client를 첫 번째 인자로 추가
+            title, r["fast"], r["slow"],
+            r["CAGR"], r["Sharpe(ann)"], r["MaxDD"]
         )
-        ok += 1
+        ok += 1              # ✅ 이 줄이 반드시 for 안쪽에 있어야 함
     print(f"[OK] Notion 업로드 완료: {ok} rows")
 
 if __name__ == "__main__":
