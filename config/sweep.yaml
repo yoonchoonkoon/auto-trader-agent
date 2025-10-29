@@ -1,0 +1,14 @@
+# config/sweep.yaml
+data_path: "data/sample_prices.csv"
+
+report_dir: "reports"
+figure_dir: "reports/figures"
+log_dir: "reports/logs"
+
+grid:
+  fast: [2, 3, 5, 10]
+  slow: [5, 10, 20]
+  fee_bp: [0, 5]   # 0bp, 0.05%
+
+# 전략명 접두사(선택): 결과 파일명/로그에 표시
+name_prefix: "sweep"

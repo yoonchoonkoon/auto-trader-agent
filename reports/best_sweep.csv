@@ -1,0 +1,2 @@
+﻿log_file,strategy,final_equity,timestamp,fast,slow,fee_bp,figure_path
+run_2025-10-29_17-09.log,sweep_f3_s5_fee0_20251029_1708,1.0291,2025-10-29_17-09,3.0,5.0,0.0,reports/figures\sweep_f3_s5_fee0_20251029_1708_2025-10-29_17-09.png

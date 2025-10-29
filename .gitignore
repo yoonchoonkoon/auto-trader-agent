@@ -1,0 +1,16 @@
+# secrets
+.env
+
+# python cache
+__pycache__/
+
+# venv
+venv/
+
+# logs & figures (무시)
+reports/logs/
+reports/figures/
+
+# 리포트/요약은 추적 허용
+!reports/*.md
+!reports/*.csv

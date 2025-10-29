@@ -1,0 +1,12 @@
+data_path: "data/sample_prices.csv"
+
+report_dir: "reports"
+figure_dir: "reports/figures"
+log_dir: "reports/logs"
+
+# 테스트용: 데이터가 적으니 작은 기간으로
+strategies:
+  - name: fast2_slow5
+    fast: 2
+    slow: 5
+    fee_bp: 5   # 0.05%
